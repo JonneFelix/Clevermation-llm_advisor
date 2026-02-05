@@ -2,6 +2,13 @@
 FROM oven/bun:1 AS builder
 WORKDIR /app
 
+# Build-Dependencies für better-sqlite3 (native addon)
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
+
 # Dependencies installieren
 COPY package.json bun.lock* ./
 RUN bun install
