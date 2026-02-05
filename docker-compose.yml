@@ -13,8 +13,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.llm-dashboard.rule=Host(`llm-advisor.clevermation.com`)"
-      - "traefik.http.routers.llm-dashboard.entrypoints=websecure"
-      - "traefik.http.routers.llm-dashboard.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.llm-dashboard.entrypoints=web"
       - "traefik.http.services.llm-dashboard.loadbalancer.server.port=3000"
     restart: unless-stopped
     networks:
@@ -28,9 +27,8 @@ services:
       - DASHBOARD_URL=http://dashboard:3000
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.llm-mcp.rule=Host(`mcp.llm-advisor.clevermation.com`)"
-      - "traefik.http.routers.llm-mcp.entrypoints=websecure"
-      - "traefik.http.routers.llm-mcp.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.llm-mcp.rule=Host(`mcp-llm-advisor.clevermation.com`)"
+      - "traefik.http.routers.llm-mcp.entrypoints=web"
       - "traefik.http.services.llm-mcp.loadbalancer.server.port=8080"
     depends_on:
       - dashboard
