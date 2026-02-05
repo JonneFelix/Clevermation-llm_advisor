@@ -1,0 +1,46 @@
+version: "3.8"
+
+services:
+  dashboard:
+    build:
+      context: ./dashboard
+      dockerfile: Dockerfile
+    environment:
+      - DATABASE_PATH=/data/llm-advisor.db
+      - AUTH_SECRET=${AUTH_SECRET}
+    volumes:
+      - llm-data:/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.llm-dashboard.rule=Host(`llm-advisor.clevermation.com`)"
+      - "traefik.http.routers.llm-dashboard.entrypoints=websecure"
+      - "traefik.http.routers.llm-dashboard.tls.certresolver=letsencrypt"
+      - "traefik.http.services.llm-dashboard.loadbalancer.server.port=3000"
+    restart: unless-stopped
+    networks:
+      - dokploy-network
+
+  mcp:
+    build:
+      context: ./mcp-server
+      dockerfile: Dockerfile
+    environment:
+      - DASHBOARD_URL=http://dashboard:3000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.llm-mcp.rule=Host(`mcp.llm-advisor.clevermation.com`)"
+      - "traefik.http.routers.llm-mcp.entrypoints=websecure"
+      - "traefik.http.routers.llm-mcp.tls.certresolver=letsencrypt"
+      - "traefik.http.services.llm-mcp.loadbalancer.server.port=8080"
+    depends_on:
+      - dashboard
+    restart: unless-stopped
+    networks:
+      - dokploy-network
+
+volumes:
+  llm-data:
+
+networks:
+  dokploy-network:
+    external: true
